@@ -72,6 +72,18 @@
         "typescript": "catalog:",
       },
     },
+    "packages/clipper": {
+      "name": "@packages/clipper",
+      "version": "0.0.0",
+      "devDependencies": {
+        "@packages/config": "workspace:*",
+        "@types/bun": "catalog:",
+        "@types/node": "catalog:",
+        "tsdown": "catalog:",
+        "tsrs": "catalog:",
+        "typescript": "catalog:",
+      },
+    },
     "packages/config": {
       "name": "@packages/config",
       "version": "0.0.0",
@@ -744,6 +756,8 @@
     "@oxlint/binding-win32-x64-msvc": ["@oxlint/binding-win32-x64-msvc@1.90.0", "", { "os": "win32", "cpu": "x64" }, "sha512-30JiaFEBUB9peEOcvVM8ggo88SoN/IdSr9DW505JdBji/R6dM66gKEiG65hw6qcaF2f4mO0cEJ+RwRZprmun9g=="],
 
     "@packages/auth": ["@packages/auth@workspace:packages/auth"],
+
+    "@packages/clipper": ["@packages/clipper@workspace:packages/clipper"],
 
     "@packages/config": ["@packages/config@workspace:packages/config"],
 

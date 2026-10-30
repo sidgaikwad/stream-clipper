@@ -45,6 +45,7 @@ next-env.d.ts
 .playwright-cli/
 .source/
 .turbo/
+/clips/
 bundle/
 dist/
 vercel-bundle/
