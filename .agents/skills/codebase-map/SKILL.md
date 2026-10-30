@@ -16,12 +16,13 @@ One Bun + Turborepo monorepo: two deployable apps over shared packages. Imports 
 api/hono/         # backend (Hono): routers, middlewares, the AppType export
 web/next/         # frontend (Next.js App Router): app/, components/, lib/, content/
 packages/auth/    # Better Auth instance
+packages/clipper/ # stream clipper engine: recorder, Twitch chat, spike detector, cutter, AI review; `bun run clip <channel>`
 packages/db/      # Drizzle schema + client
 packages/env/     # type-safe env, one validated entry per consumer
 packages/config/  # TS base, tsdown factory, and site.ts (brand identity)
 packages/scripts/ # every build, CI and repo script, in bun TypeScript (codegen, sync-config, deps-manager, skills-manager, clean); never bundled
 packages/cli/     # the zerostarter scaffolding CLI (canonical repo only; init strips it)
-tests/            # the whole suite, mirroring each subject's path; *.e2e.test.ts drive a running stack (canonical repo only; forks take no tests)
+tests/            # the whole suite, mirroring each subject's path; *.e2e.test.ts drive a running stack
 ```
 
 Read `AGENTS.md` first for the rules; `curl "$(bunx portless get stream-clipper)/llms-full.txt"` dumps the whole codebase as one context file.
@@ -41,6 +42,7 @@ Read `AGENTS.md` first for the rules; `curl "$(bunx portless get stream-clipper)
 | Add or change an auth plugin, or a column on `user`/`session` | `packages/auth/src/schema.ts` (`additionalFields` for a column) → `bun run auth:schema` regenerates `packages/db/src/schema/auth.ts` | `db-migration` skill |
 | Add a data table | colocate `data-columns.tsx` + `data-table.tsx` in the page's `components/` folder, composing `web/next/src/components/data-table.tsx` (reference: `(console)/console/(access)/users/`) | `design` skill |
 | Add a test | `tests/<path of the file under test>.test.ts`; run the suite with `bun run test`. An end-to-end test is `tests/<path of the router or page it drives>.e2e.test.ts` on the `tests/stack.ts` helper, run against a stack with `bun run test:e2e` | `docker-test` skill |
+| Change how clips are detected, cut, or rated | `packages/clipper/src/{detector,cutter,ai}.ts`; the loop that ties them together is `watch.ts`, flags live in `cli.ts` | - |
 | Add a build or tooling script | `packages/scripts/src/<name>.ts`, with its deps on that package | - |
 | Change a `tsconfig.json`, or a package's type-check devDependencies or `check-types` | `packages/scripts/src/sync-config/template.json` for all, or the target's own patch beside it (`web-next.json`) → `bun run sync:config`; never the generated file | `add-package` skill |
 | Gate by role | the ladder and every access decision live in `packages/auth/src/access.ts` (pure, unit-tested, imported as `@packages/auth/access`); `web/next/src/lib/auth/console.ts` gates the pages at member, `api/hono/src/middlewares/console.ts` requires admin for the whole console router via `requireConsoleRole` | - |

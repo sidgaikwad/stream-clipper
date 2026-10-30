@@ -1,6 +1,6 @@
 # AGENTS.md
 
-Guidance for AI coding agents working in this repository, a Bun monorepo: the `web/next` app, the `api/hono` service, and shared `packages/*` (auth, config, db, env), with build-only tooling in `packages/scripts`. The canonical starter also carries the `packages/cli` npm binary and the `tests/` suite, neither of which a fork takes; this guide and every skill ship to a fork whole, rebranded to its name. Start each task with the `codebase-map` skill to orient, then load the task skill that fits (see [Skills](#skills)).
+Guidance for AI coding agents working in this repository, a Bun monorepo: the `web/next` app, the `api/hono` service, and shared `packages/*` (auth, clipper, config, db, env), with build-only tooling in `packages/scripts`. `packages/clipper` is the product engine: it records Twitch streams, watches chat for spikes, cuts clips, and rates them with AI (`bun run clip <channel>`). The canonical starter also carries the `packages/cli` npm binary and the `tests/` suite, neither of which a fork takes; this guide and every skill ship to a fork whole, rebranded to its name. Start each task with the `codebase-map` skill to orient, then load the task skill that fits (see [Skills](#skills)).
 
 ## Workflow
 
