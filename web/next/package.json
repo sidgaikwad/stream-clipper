@@ -80,7 +80,7 @@
     "defaults"
   ],
   "portless": {
-    "name": "zerostarter",
+    "name": "stream-clipper",
     "script": "dev:app"
   }
 }
