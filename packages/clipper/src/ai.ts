@@ -22,7 +22,7 @@ const schema = {
 
 export const buildPrompt = (channel: string, from: number, messages: ChatMessage[]) =>
   [
-    `You review moments from the Twitch streamer "${channel}" for a clips channel.`,
+    `You review moments from the streamer "${channel}" for a clips channel.`,
     "Chat suddenly got much busier. Below is the chat during the clip window, with seconds from the start of the clip.",
     "Judge from the chat reaction how clip-worthy the moment probably is.",
     "Return score (1 = nothing happened, 10 = must clip), a punchy YouTube Shorts title under 60 characters, and a one-sentence reason.",

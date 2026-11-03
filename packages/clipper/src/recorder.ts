@@ -7,10 +7,11 @@ export const SEGMENT_SECONDS = 10
 
 export type RecorderOptions = {
   bufferMs: number
-  channel: string
   dir: string
   log: (message: string) => void
+  name: string
   quality: string
+  url: string
 }
 
 export const listSegments = async (dir: string): Promise<Segment[]> => {
@@ -21,7 +22,7 @@ export const listSegments = async (dir: string): Promise<Segment[]> => {
     .sort((a, b) => a.start - b.start)
 }
 
-export const startRecorder = ({ bufferMs, channel, dir, log, quality }: RecorderOptions) => {
+export const startRecorder = ({ bufferMs, dir, log, name, quality, url }: RecorderOptions) => {
   let stopped = false
   let streamlink: Bun.Subprocess | undefined
   let ffmpeg: Bun.Subprocess | undefined
@@ -29,10 +30,10 @@ export const startRecorder = ({ bufferMs, channel, dir, log, quality }: Recorder
   const record = async () => {
     await mkdir(dir, { recursive: true })
     while (!stopped) {
-      streamlink = Bun.spawn(
-        ["streamlink", "--stdout", "--twitch-disable-ads", `https://twitch.tv/${channel}`, quality],
-        { stderr: "ignore", stdout: "pipe" },
-      )
+      streamlink = Bun.spawn(["streamlink", "--stdout", "--twitch-disable-ads", url, quality], {
+        stderr: "ignore",
+        stdout: "pipe",
+      })
       ffmpeg = Bun.spawn(
         [
           "ffmpeg",
@@ -55,11 +56,11 @@ export const startRecorder = ({ bufferMs, channel, dir, log, quality }: Recorder
         ],
         { stderr: "inherit", stdin: streamlink.stdout as ReadableStream },
       )
-      log(`recording ${channel} (${quality})`)
+      log(`recording ${name} (${quality})`)
       await ffmpeg.exited
       streamlink.kill()
       if (stopped) break
-      log(`${channel} is offline or the stream dropped, retrying in 60s`)
+      log(`${name} is offline or the stream dropped, retrying in 60s`)
       await Bun.sleep(60_000)
     }
   }

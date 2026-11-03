@@ -7,12 +7,20 @@ export type DetectorOptions = {
   windowMs: number
 }
 
+export type Signal = "audio" | "chat"
+
 export type Spike = {
   at: number
   baseline: number
   detectedAt: number
-  messages: number
+  signal: Signal
+  value: number
 }
+
+export const spikeStrength = (spike: Spike) =>
+  spike.signal === "audio"
+    ? spike.value - spike.baseline
+    : spike.value / Math.max(spike.baseline, 1)
 
 export const defaultDetectorOptions: DetectorOptions = {
   baselineMs: 5 * 60_000,
@@ -50,6 +58,6 @@ export class SpikeDetector {
     if (messages < minMessages || messages < baseline * multiplier) return null
 
     this.lastSpikeAt = now
-    return { at: windowStart, baseline, detectedAt: now, messages }
+    return { at: windowStart, baseline, detectedAt: now, signal: "chat", value: messages }
   }
 }

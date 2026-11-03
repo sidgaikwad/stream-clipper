@@ -27,7 +27,7 @@ describe("SpikeDetector", () => {
     steadyChat(detector, 1_000, 110_000, 2_000)
     steadyChat(detector, 110_100, 120_000, 200)
     const spike = detector.check(120_000)
-    expect(spike).toMatchObject({ at: 110_000, detectedAt: 120_000, messages: 50 })
+    expect(spike).toMatchObject({ at: 110_000, detectedAt: 120_000, signal: "chat", value: 50 })
     expect(spike!.baseline).toBeCloseTo(5)
   })
 

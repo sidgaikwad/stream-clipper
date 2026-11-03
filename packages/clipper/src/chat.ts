@@ -6,12 +6,12 @@ export type ChatMessage = {
 
 const PRIVMSG = /^(?:@\S+ )?:(\w+)!\S+ PRIVMSG #\w+ :(.*)$/
 
-export const parseChatLine = (line: string, at: number): ChatMessage | null => {
+export const parseTwitchChatLine = (line: string, at: number): ChatMessage | null => {
   const match = PRIVMSG.exec(line)
   return match ? { at, text: match[2]!, user: match[1]! } : null
 }
 
-export const connectChat = (channel: string, onMessage: (message: ChatMessage) => void) => {
+export const connectTwitchChat = (channel: string, onMessage: (message: ChatMessage) => void) => {
   let socket: WebSocket | undefined
   let stopped = false
 
@@ -26,7 +26,7 @@ export const connectChat = (channel: string, onMessage: (message: ChatMessage) =
       const at = Date.now()
       for (const line of String(event.data).split("\r\n")) {
         if (line.startsWith("PING")) socket!.send(line.replace("PING", "PONG"))
-        const message = parseChatLine(line, at)
+        const message = parseTwitchChatLine(line, at)
         if (message) onMessage(message)
       }
     })
