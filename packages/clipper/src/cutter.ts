@@ -14,16 +14,9 @@ export const pickSegments = (segments: Segment[], from: number, to: number) => {
   return { offsetMs: picked.length ? Math.max(0, from - picked[0]!.start) : 0, segments: picked }
 }
 
-export const cutClip = async (segments: Segment[], from: number, to: number, output: string) => {
-  const picked = pickSegments(segments, from, to)
-  if (!picked.segments.length) throw new Error("no recorded segments cover this clip")
+const seconds = (ms: number) => (Math.max(0, ms) / 1000).toFixed(2)
 
-  const list = `${output}.txt`
-  await Bun.write(
-    list,
-    picked.segments.map((s) => `file '${s.path.replaceAll("'", "'\\''")}'`).join("\n"),
-  )
-
+const encode = async (input: string[], durationMs: number, output: string) => {
   const ffmpeg = Bun.spawn(
     [
       "ffmpeg",
@@ -31,16 +24,9 @@ export const cutClip = async (segments: Segment[], from: number, to: number, out
       "-loglevel",
       "error",
       "-y",
-      "-f",
-      "concat",
-      "-safe",
-      "0",
-      "-i",
-      list,
-      "-ss",
-      (picked.offsetMs / 1000).toFixed(2),
+      ...input,
       "-t",
-      ((to - from) / 1000).toFixed(2),
+      seconds(durationMs),
       "-c:v",
       "libx264",
       "-preset",
@@ -57,7 +43,31 @@ export const cutClip = async (segments: Segment[], from: number, to: number, out
     ],
     { stderr: "pipe" },
   )
-  const code = await ffmpeg.exited
-  await rm(list, { force: true })
-  if (code !== 0) throw new Error(`ffmpeg failed: ${await new Response(ffmpeg.stderr).text()}`)
+  if ((await ffmpeg.exited) !== 0) {
+    throw new Error(`ffmpeg failed: ${await new Response(ffmpeg.stderr).text()}`)
+  }
 }
+
+export const cutClip = async (segments: Segment[], from: number, to: number, output: string) => {
+  const picked = pickSegments(segments, from, to)
+  if (!picked.segments.length) throw new Error("no recorded segments cover this clip")
+
+  const list = `${output}.txt`
+  await Bun.write(
+    list,
+    picked.segments.map((s) => `file '${s.path.replaceAll("'", "'\\''")}'`).join("\n"),
+  )
+
+  try {
+    await encode(
+      ["-f", "concat", "-safe", "0", "-i", list, "-ss", seconds(picked.offsetMs)],
+      to - from,
+      output,
+    )
+  } finally {
+    await rm(list, { force: true })
+  }
+}
+
+export const cutFile = (input: string, from: number, to: number, output: string) =>
+  encode(["-ss", seconds(from), "-i", input], to - from, output)
